@@ -4,7 +4,6 @@ const loadCategories=()=>{
     .then(data=>display(data.categories))
     .catch(error=>console.log(error));
 }
-
 const activeClassRemove=()=>{
     const btns=document.getElementsByClassName('category-btn');
     for(const btn of btns){
@@ -24,9 +23,28 @@ const loadCategoriesVideos=(id)=>{
     })
     .catch(error=>console.log(error));
 }
+const loadDetails= async (videoId) => {
+    console.log(videoId);
+    const url=`https://openapi.programming-hero.com/api/phero-tube/video/${videoId}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    displayDetail(data.video);
 
-const loadVideos=()=>{
-    fetch("https://openapi.programming-hero.com/api/phero-tube/videos")
+}
+const displayDetail=(details)=>{
+    console.log(details);
+    const modalContainer=document.getElementById('modal-content');
+    modalContainer.innerHTML=`
+    <img src=${details.thumbnail} />
+    <p>${details.description}</p>
+    `
+    //way-1
+    // document.getElementById('showModalData').click();
+    //way-2
+    document.getElementById('customModal').showModal();
+}
+const loadVideos=(searchText="")=>{
+    fetch(`https://openapi.programming-hero.com/api/phero-tube/videos?title=${searchText}`)
     .then(res=>res.json())
     .then(data=>displayVideos(data.videos))
     .catch(error=>console.log(error));
@@ -78,13 +96,14 @@ const displayVideos=(videos)=>{
         src=${video.authors[0].profile_picture}
         />
         </div>
-        <div>
+        <div class="">
         <h2 class="font-bold">${video.title}</h2>
         <div class="flex gap-2 items-center">
         <p>${video.authors[0].profile_name}</p>
         ${video.authors[0].verified == true ? `<img class="w-5 h-5" src="https://img.icons8.com/?size=48&id=D9RtvkuOe31p&format=png"/>`:""}
         </div>
         </div>
+        <button onclick="loadDetails('${video.video_id}')" class="btn btn-sm btn-error self-end ">Details</button>
   </div>`;
 
   videosContainer.append(card);
@@ -107,3 +126,6 @@ categories.forEach(category => {
 }
 loadCategories();
 loadVideos();
+document.getElementById('search-item').addEventListener('keyup',function(e){
+    loadVideos(e.target.value);
+})
