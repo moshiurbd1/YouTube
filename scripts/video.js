@@ -4,11 +4,24 @@ const loadCategories=()=>{
     .then(data=>display(data.categories))
     .catch(error=>console.log(error));
 }
+
+const activeClassRemove=()=>{
+    const btns=document.getElementsByClassName('category-btn');
+    for(const btn of btns){
+        btn.classList.remove('active');
+    }
+}
 const loadCategoriesVideos=(id)=>{
     // alert(id);
     fetch(`https://openapi.programming-hero.com/api/phero-tube/category/${id}`)
     .then(res=>res.json())
-    .then(data=>displayVideos(data.category))
+    .then(data=>{
+        const btn=document.getElementById(`btn-${id}`);
+        console.log(btn);
+        activeClassRemove();
+        btn.classList.add('active');
+        displayVideos(data.category)
+    })
     .catch(error=>console.log(error));
 }
 
@@ -86,7 +99,7 @@ categories.forEach(category => {
     // console.log(category)
     const buttonContainer=document.createElement('div');
     buttonContainer.innerHTML=`
-    <button class="btn" onclick="loadCategoriesVideos(${category.category_id})">${category.category}</button>
+    <button class="btn category-btn" id="btn-${category.category_id}" onclick="loadCategoriesVideos(${category.category_id})">${category.category}</button>
     `;
     button.append(buttonContainer);
 
